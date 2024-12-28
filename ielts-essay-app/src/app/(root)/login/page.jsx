@@ -151,7 +151,7 @@ export default function Login() {
                 width: "100px",
               }}
             >
-              Login
+              <Link href={"../../components"}>Login</Link>
             </button>
             <h2>
               create an new account? <Link href={"./register"}>Login here</Link>

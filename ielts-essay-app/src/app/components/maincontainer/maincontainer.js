@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export default function MainContent() {
   const [essay, setEssay] = useState("");
+  const [prompt, setPrompt] = useState("");
 
   const handleSubmit = async () => {
     const response = await fetch("/api/evaluate", {
@@ -15,8 +16,19 @@ export default function MainContent() {
     alert(`Evaluation Score: ${result.score}`);
   };
 
+  console.log("Prompt: ", prompt);
+
   return (
     <div className="main">
+      <textarea
+        value={prompt}
+        style={{ height: "40px" }}
+        onChange={(e) => {
+          setPrompt(e.target.value);
+          console.log("Prompt: ", e.target.value);
+        }}
+        placeholder="Paste your prompt here..."
+      ></textarea>
       <textarea
         value={essay}
         onChange={(e) => setEssay(e.target.value)}
