@@ -140,7 +140,7 @@ export default function Login() {
               className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
               style={{
                 position: "fixed",
-                top: "65%",
+                top: "55%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 background: "#475569",
@@ -153,7 +153,11 @@ export default function Login() {
             >
               <Link href={"../../components"}>Login</Link>
             </button>
-            <h2>
+            <h2
+              style={{
+                marginTop: "100px",
+              }}
+            >
               create an new account? <Link href={"./register"}>Login here</Link>
             </h2>
           </form>

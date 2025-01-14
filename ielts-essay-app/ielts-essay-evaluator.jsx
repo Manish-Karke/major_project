@@ -1,15 +1,9 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useState } from 'react'
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 const placeholderResult = `
 IELTS Essay Evaluation:
@@ -31,31 +25,27 @@ Areas for Improvement:
 - Strengthen the conclusion
 - Improve paragraph transitions
 - Reduce minor grammatical errors
-`;
+`
 
 export default function IELTSEssayEvaluator() {
-  const [essay, setEssay] = useState("");
-  const [result, setResult] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [essay, setEssay] = useState('')
+  const [result, setResult] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault()
+    setIsLoading(true)
 
     // Simulating API call with a timeout
     setTimeout(() => {
-      setResult(placeholderResult);
-      setIsLoading(false);
-    }, 2000);
-  };
+      setResult(placeholderResult)
+      setIsLoading(false)
+    }, 2000)
+  }
 
   return (
-    <div className="container mx-auto p-4 max-w-6xl">
-      {" "}
-      {/* Increased max-width */}
-      <Card className="w-full">
-        {" "}
-        {/* Ensures the card takes the full container width */}
+    (<div className="container mx-auto p-4 max-w-3xl">
+      <Card>
         <CardHeader>
           <CardTitle>IELTS Essay Evaluator</CardTitle>
         </CardHeader>
@@ -66,10 +56,9 @@ export default function IELTSEssayEvaluator() {
               value={essay}
               onChange={(e) => setEssay(e.target.value)}
               rows={10}
-              className="mb-4 w-full bg-slate-700 text-white p-4"
-            />
+              className="mb-4" />
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Evaluating..." : "Evaluate Essay"}
+              {isLoading ? 'Evaluating...' : 'Evaluate Essay'}
             </Button>
           </form>
         </CardContent>
@@ -82,6 +71,7 @@ export default function IELTSEssayEvaluator() {
           </div>
         </CardFooter>
       </Card>
-    </div>
+    </div>)
   );
 }
+
