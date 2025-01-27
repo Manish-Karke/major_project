@@ -6,90 +6,176 @@
     <title>WebSocket Response Display</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e; /* Black background */
+            color: #ddd; /* Light text color */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
+
+        h1 {
+            font-size: 22px;
+            color: #fff;
+            margin-top: 20px;
+        }
+
         #responseContainer {
             margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            height: 300px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #333; /* Dark response container */
+            border: 1px solid #444;
+            width: 80%;
+            max-width: 600px;
+            height: 400px;
             overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            display: none; /* Hide initially */
         }
+
         .token {
-            color: #333;
-            padding: 2px 4px;
-            margin: 2px;
+            color: #ddd;
+            padding: 1px 1px;
+            margin: 1px;
             display: inline-block;
-            background-color: #eaeaea;
-            border-radius: 4px;
+            /* background-color: #666; 
+            border-radius: 4px; */
+        }
+
+        .chat-message {
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #444; /* Dark background for user message */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            font-size: 14px; /* Smaller font size */
+        }
+
+        #promptInput {
+            width: 80%;
+            min-height: 40px;
+            padding: 10px;
+            margin-top: 20px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            max-width: 600px;
+            background-color: #222; /* Dark input background */
+            color: #fff; /* Light text color */
+        }
+
+        #sendButton {
+            width: 80%;
+            padding: 12px;
+            margin-top: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            max-width: 600px;
+        }
+
+        #sendButton:hover {
+            background-color: #45a049;
+        }
+
+        /* Adjust the prompt box to grow in height like ChatGPT */
+        #promptInput:focus {
+            min-height: 100px; /* Allow box to grow */
+            transition: all 0.3s ease-in-out;
         }
     </style>
 </head>
 <body>
     <h1>WebSocket Response Display</h1>
-    <button id="startButton">Start WebSocket Connection</button>
+
+    <!-- Chat-like Interface -->
     <div id="responseContainer">
         <p><strong>Response:</strong></p>
     </div>
 
+    <textarea id="promptInput" rows="4" placeholder="Type your prompt here..."></textarea>
+    <button id="sendButton">Send</button>
+
     <script>
-        document.getElementById('startButton').addEventListener('click', () => {
-            const WebSocket = window.WebSocket || window.MozWebSocket;
-            const socket = new WebSocket('wss://ray-champion-crow.ngrok-free.app/stream/'); // Replace with your ngrok URL
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const promptInput = document.getElementById('promptInput');
+            const prompt = promptInput.value.trim();
 
-            const responseContainer = document.getElementById('responseContainer');
+            if (prompt) {
+                // Display the prompt in a chat-like format, without the "You"
+                const userMessage = document.createElement('div');
+                userMessage.className = 'chat-message';
+                userMessage.textContent = prompt; // Display the user's message directly
+                document.getElementById('responseContainer').appendChild(userMessage);
 
-            socket.onopen = () => {
-                console.log('Connected to the WebSocket server');
-                const prompt = 'Young people who commit crimes should be treated in the same way as adults who commit crimes. To what extent do you agree or disagree? Deciding to choose among the potential ways of punishing young people who commit crimes continues to be a controversial issue for the societies and the governments. It is argued by some that these people should be treated the same as adults. I personally disagree with this opinion due to the adverse effects of imprisonment on a teenager’s mental health. Many countries put the criminals of their society at jails considering it as a very effective way of punishment. It is understandable that this does exert a positive influence on decreasing crime in the society by putting the criminals in an unpleasant situation which they would mostly never wish to experience again. As a result, this could impede them from attempting crime in the future. For example, my friend who had been sent to jail for 2 months because of repeatedly committing traffic offends, has never committed the same crime since being released admitting that being in prison had been intolerable for her. However, I believe using the same way of punishment for youngsters would not be a wise idea. In fact, teenagers are at a very critical age in which the core of their personality is being shaped. There for, sending them to prison like adults as a way of punishment for their crimes, which are most often pity crimes, would actually expose them to other criminals who might have some serious personality disorders and this would adversely affect their personality as an adult in the future. To put in another way, such punishments are potential to become a threat to their mental health leading them to commit more serious crimes in a long run. For instance, according to the law of my country, young people are being punished the same as adults. A recent survey revealed that this policy has not been effective so far since 60% of these teenage criminals end up drug trafficking after being released from prison which had been sent to for a pity crime. In conclusion, although the ways that adults are being punished in many countries might be quite effective to decrease crime rate, I do not agree that it is a wise decision to use these ways for punishing young people as well.';
-                socket.send(JSON.stringify({ prompt: prompt }));
-            };
+                // Clear the prompt input after sending
+                promptInput.value = '';
 
-            socket.onmessage = (event) => {
-                const response = JSON.parse(event.data);
-                if (response.token) {
-                    console.log('Received token:', response.token);
+                // Show the response container now that a prompt is sent
+                document.getElementById('responseContainer').style.display = 'block';
 
-                    // Check if the token is empty, null, or only whitespace
-                    if (response.token.trim()) {
-                        // If the token has content, create a span element for it
-                        const tokenSpan = document.createElement('span');
-                        tokenSpan.className = 'token';
-                        tokenSpan.textContent = response.token;
+                // Open WebSocket connection
+                const WebSocket = window.WebSocket || window.MozWebSocket;
+                const socket = new WebSocket('wss://ray-champion-crow.ngrok-free.app/stream/'); // Replace with your ngrok URL
 
-                        // Replace the whitespace or empty token with the span
-                        responseContainer.appendChild(tokenSpan);
-                    } else {
-                        // Replace empty or whitespace token with <br> tag
-                        const lineBreak = document.createElement('br');
-                        responseContainer.appendChild(lineBreak);
+                const responseContainer = document.getElementById('responseContainer');
+
+                socket.onopen = () => {
+                    console.log('Connected to the WebSocket server');
+                    socket.send(JSON.stringify({ prompt: prompt }));
+                };
+
+                socket.onmessage = (event) => {
+                    const response = JSON.parse(event.data);
+                    if (response.token) {
+                        console.log('Received token:', response.token);
+
+                        // Check if the token is empty, null, or only whitespace
+                        if (response.token.trim()) {
+                            // If the token has content, create a span element for it
+                            const tokenSpan = document.createElement('span');
+                            tokenSpan.className = 'token';
+                            tokenSpan.textContent = response.token;
+
+                            responseContainer.appendChild(tokenSpan);
+                        } else {
+                            // Replace empty or whitespace token with <br> tag
+                            const lineBreak = document.createElement('br');
+                            responseContainer.appendChild(lineBreak);
+                        }
+                    } else if (response.status) {
+                        console.log(response.status);
+                        const statusMessage = document.createElement('p');
+                        statusMessage.textContent = response.status;
+                        responseContainer.appendChild(statusMessage);
                     }
-                } else if (response.status) {
-                    console.log(response.status);
-                    const statusMessage = document.createElement('p');
-                    statusMessage.textContent = response.status;
-                    responseContainer.appendChild(statusMessage);
-                }
-            };
+                };
 
-            socket.onerror = (error) => {
-                console.error('WebSocket error:', error);
-                const errorMessage = document.createElement('p');
-                errorMessage.style.color = 'red';
-                errorMessage.textContent = 'WebSocket error: ' + error.message;
-                responseContainer.appendChild(errorMessage);
-            };
+                socket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    const errorMessage = document.createElement('p');
+                    errorMessage.style.color = 'red';
+                    errorMessage.textContent = 'WebSocket error: ' + error.message;
+                    responseContainer.appendChild(errorMessage);
+                };
 
-            socket.onclose = () => {
-                console.log('Disconnected from the WebSocket server');
-                const closeMessage = document.createElement('p');
-                closeMessage.style.color = 'gray';
-                closeMessage.textContent = 'Disconnected from the WebSocket server';
-                responseContainer.appendChild(closeMessage);
-            };
+                socket.onclose = () => {
+                    console.log('Disconnected from the WebSocket server');
+                    const closeMessage = document.createElement('p');
+                    closeMessage.style.color = 'gray';
+                    closeMessage.textContent = 'Disconnected from the WebSocket server';
+                    responseContainer.appendChild(closeMessage);
+                };
+            }
         });
     </script>
 </body>
