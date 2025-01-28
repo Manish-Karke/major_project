@@ -9,43 +9,29 @@ export default function Home() {
   const [socket, setSocket] = useState(null);
   const [tokensVisible, setTokensVisible] = useState(false);
 
-  useEffect(() => {
-    // Check if window is defined before attempting to use browser-specific code
-    if (typeof window !== "undefined") {
-      const ws = new WebSocket("wss://ray-champion-crow.ngrok-free.app/stream/");
-      setSocket(ws);
-
-      ws.onopen = () => console.log("Connected to the WebSocket server");
-      ws.onclose = () => console.log("Disconnected from the WebSocket server");
-      ws.onerror = (error) => console.error("WebSocket error:", error);
-
-      return () => ws.close();
-    }
-  }, []); // Empty dependency array means this effect runs once on component mount
-
   const sendPrompt = () => {
     if (prompt.trim() && socket) {
-      socket.send(JSON.stringify({ prompt }));
-      setUserPrompt(prompt); // Set the userPrompt to the current input
-      setPrompt("");
-      setTokensVisible(true);
-      setTokens([]); // Clear tokens on new prompt
+      // Wait until WebSocket is open
+      if (socket.readyState === WebSocket.OPEN) {
+        // Send the prompt if the socket is open
+        socket.send(JSON.stringify({ prompt }));
+        setUserPrompt(prompt); // Set the userPrompt to the current input
+        setPrompt(""); // Clear the prompt
+        setTokensVisible(true);
+        setTokens([]); // Clear tokens on new prompt
+      } else {
+        // If not open yet, wait for the WebSocket to open and then send the prompt
+        socket.onopen = () => {
+          console.log("WebSocket is open, sending prompt...");
+          socket.send(JSON.stringify({ prompt }));
+          setUserPrompt(prompt); // Set the userPrompt to the current input
+          setPrompt(""); // Clear the prompt
+          setTokensVisible(true);
+          setTokens([]); // Clear tokens on new prompt
+        };
+      }
     }
-  };
-
-  useEffect(() => {
-    if (socket) {
-      socket.onmessage = (event) => {
-        const response = JSON.parse(event.data);
-        if (response.token?.trim()) {
-          setTokens((prev) => [
-            ...prev,
-            response.token === "<br>" ? "\n" : response.token,
-          ]);
-        }
-      };
-    }
-  }, [socket]);
+  };      
 
   return (
     <div className="app-container">
@@ -76,7 +62,11 @@ export default function Home() {
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
         />
-        <button id="sendButton" onClick={sendPrompt}>
+        <button
+          id="sendButton"
+          onClick={sendPrompt}
+          disabled={!prompt.trim()} // Disable the button if the prompt is empty
+        >
           Send
         </button>
       </div>
@@ -169,6 +159,11 @@ export default function Home() {
 
         #sendButton:hover {
           background-color: #45a049;
+        }
+
+        #sendButton:disabled {
+          background-color: #808080;
+          cursor: not-allowed;
         }
 
         /* Flexbox for centralizing layout */
