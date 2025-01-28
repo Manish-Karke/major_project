@@ -11,27 +11,27 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const placeholderResult = `
-IELTS Essay Evaluation:
+// const placeholderResult = `
+// IELTS Essay Evaluation:
 
-Task Achievement: 7.5
-Coherence and Cohesion: 7.0
-Lexical Resource: 8.0
-Grammatical Range and Accuracy: 7.5
+// Task Achievement: 7.5
+// Coherence and Cohesion: 7.0
+// Lexical Resource: 8.0
+// Grammatical Range and Accuracy: 7.5
 
-Overall Band Score: 7.5
+// Overall Band Score: 7.5
 
-Comments:
-- Well-developed response with relevant ideas
-- Good use of cohesive devices
-- Wide range of vocabulary with some sophisticated words
-- Generally well-structured sentences with minor errors
+// Comments:
+// - Well-developed response with relevant ideas
+// - Good use of cohesive devices
+// - Wide range of vocabulary with some sophisticated words
+// - Generally well-structured sentences with minor errors
 
-Areas for Improvement:
-- Strengthen the conclusion
-- Improve paragraph transitions
-- Reduce minor grammatical errors
-`;
+// Areas for Improvement:
+// - Strengthen the conclusion
+// - Improve paragraph transitions
+// - Reduce minor grammatical errors
+// `;
 
 export default function IELTSEssayEvaluator() {
   const [essay, setEssay] = useState("");
@@ -77,7 +77,7 @@ export default function IELTSEssayEvaluator() {
           <div className="w-full">
             <h3 className="text-lg font-semibold mb-2">Evaluation Result:</h3>
             <pre className="whitespace-pre-wrap bg-gray-100 p-4 rounded">
-              {result || placeholderResult}
+              {result}
             </pre>
           </div>
         </CardFooter>
