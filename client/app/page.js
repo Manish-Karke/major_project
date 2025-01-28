@@ -50,11 +50,11 @@ export default function Home() {
   return (
     <div className="app-container">
       <h1>WebSocket Token Display</h1>
-      <div className="scrollable-container">
+      <div className="content-container">
         {tokensVisible && (
           <>
             <div id="userPrompt" className="user-prompt">
-              <strong>Your Prompt:</strong> {userPrompt}
+              {userPrompt}
             </div>
             <div id="tokensContainer" className="tokens-container">
               {tokens.map((token, index) =>
@@ -103,7 +103,7 @@ export default function Home() {
           text-align: center;
         }
 
-        .scrollable-container {
+        .content-container {
           width: 100%;
           height: calc(100vh - 160px); /* Remaining height after title and input */
           overflow-y: auto;
@@ -121,24 +121,18 @@ export default function Home() {
           border: 1px solid #555;
           color: #fff;
           width: 80%;
-          max-width: 600px;
+          max-width: 490px;
           font-size: 16px;
           word-wrap: break-word;
+          margin-left: 15%; /* Shift the user prompt box to the right */
         }
 
         .tokens-container {
           margin-top: 20px;
-          padding: 20px;
-          border-radius: 10px;
-          background-color: #333;
-          border: 1px solid #444;
           width: 80%;
           max-width: 600px;
-          height: auto;
           min-height: 100px;
           max-height: 400px;
-          overflow-y: auto; /* Allow vertical scroll */
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
           white-space: pre-wrap;
           word-wrap: break-word;
         }
