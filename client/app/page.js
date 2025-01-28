@@ -9,29 +9,70 @@ export default function Home() {
   const [socket, setSocket] = useState(null);
   const [tokensVisible, setTokensVisible] = useState(false);
 
+  useEffect(() => {
+    // Cleanup the WebSocket connection when the component unmounts
+    return () => {
+      if (socket) {
+        socket.close();
+      }
+    };
+  }, [socket]);
+
   const sendPrompt = () => {
-    if (prompt.trim() && socket) {
-      // Wait until WebSocket is open
-      if (socket.readyState === WebSocket.OPEN) {
-        // Send the prompt if the socket is open
-        socket.send(JSON.stringify({ prompt }));
-        setUserPrompt(prompt); // Set the userPrompt to the current input
-        setPrompt(""); // Clear the prompt
-        setTokensVisible(true);
-        setTokens([]); // Clear tokens on new prompt
-      } else {
-        // If not open yet, wait for the WebSocket to open and then send the prompt
-        socket.onopen = () => {
+    if (prompt.trim()) {
+      // Attempt to connect WebSocket if not already connected
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        const newSocket = new WebSocket("wss://ray-champion-crow.ngrok-free.app/stream/");
+        setSocket(newSocket);
+
+        const timeout = setTimeout(() => {
+          if (newSocket.readyState !== WebSocket.OPEN) {
+            alert("Unable to connect to the server. Please try again.");
+            setSocket(null);
+          }
+        }, 5000);
+
+        newSocket.onopen = () => {
+          clearTimeout(timeout);
           console.log("WebSocket is open, sending prompt...");
-          socket.send(JSON.stringify({ prompt }));
-          setUserPrompt(prompt); // Set the userPrompt to the current input
-          setPrompt(""); // Clear the prompt
+          newSocket.send(JSON.stringify({ prompt })); // Send the prompt
+          setUserPrompt(prompt);
+          setPrompt("");
           setTokensVisible(true);
-          setTokens([]); // Clear tokens on new prompt
+          setTokens([]); // Clear previous tokens
         };
+
+        newSocket.onmessage = (event) => {
+          // Parse and handle incoming tokens
+          try {
+            const message = JSON.parse(event.data);
+            if (message.token) {
+              setTokens((prevTokens) => [...prevTokens, message.token]);
+            }
+          } catch (err) {
+            console.error("Error parsing WebSocket message:", err);
+          }
+        };
+
+        newSocket.onerror = () => {
+          clearTimeout(timeout);
+          alert("There was an error connecting to the server. Please try again.");
+          setSocket(null);
+        };
+
+        newSocket.onclose = () => {
+          console.log("WebSocket connection closed.");
+          setSocket(null);
+        };
+      } else {
+        socket.send(JSON.stringify({ prompt }));
+        setUserPrompt(prompt);
+        setPrompt("");
+        setTokensVisible(true);
+        setTokens([]); // Clear previous tokens
       }
     }
-  };      
+  };
 
   return (
     <div className="app-container">
