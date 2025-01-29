@@ -1,5 +1,5 @@
 "use client";
-
+import Login from "@/app/(login)/page";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -44,7 +44,7 @@ export default function Register() {
       setIsRegistered(true);
       setTimeout(() => {
         setIsRegistered(false);
-        router.push("../../components");
+        router.push("/");
       }, 2000);
     } catch (error) {
       setError(error.message);
@@ -114,7 +114,7 @@ export default function Register() {
         </button>
         <p className="text-white mt-4 text-center">
           Already have an account?{" "}
-          <Link href="" className="text-blue-400">
+          <Link href="/" className="text-blue-400">
             Login here
           </Link>
         </p>

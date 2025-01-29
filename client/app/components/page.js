@@ -1,27 +1,25 @@
 "use client";
-
 import React, { useState, useEffect, useRef } from "react";
 import ProtectedRoute from "./ProtectedRoute";
+import { logout } from "../Firebase/auth";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
-  const [response, setResponse] = useState(""); // Store the response as a single string
+  const [response, setResponse] = useState("");
   const [socket, setSocket] = useState(null);
-  const [history, setHistory] = useState([]); // Store prompt and response history
+  const [history, setHistory] = useState([]);
   const textareaRef = useRef(null);
 
-  // Adjust textarea height dynamically
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"; // Reset height
+      textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${Math.min(
         textareaRef.current.scrollHeight,
-        300 // maxHeight
+        300
       )}px`;
     }
   }, [prompt]);
 
-  // Cleanup the WebSocket connection when the component unmounts
   useEffect(() => {
     return () => {
       if (socket) {
@@ -32,7 +30,6 @@ export default function Home() {
 
   const sendPrompt = () => {
     if (prompt.trim()) {
-      // Attempt to connect WebSocket if not already connected
       if (!socket || socket.readyState !== WebSocket.OPEN) {
         const newSocket = new WebSocket(
           "wss://ray-champion-crow.ngrok-free.app/stream/"
@@ -49,30 +46,25 @@ export default function Home() {
         newSocket.onopen = () => {
           clearTimeout(timeout);
           console.log("WebSocket is open, sending prompt...");
-          newSocket.send(JSON.stringify({ prompt })); // Send the prompt
+          newSocket.send(JSON.stringify({ prompt }));
           setHistory((prevHistory) => [
             ...prevHistory,
-            { prompt, response: "" }, // Add new prompt to history with empty response
+            { prompt, response: "" },
           ]);
           setPrompt("");
-          setResponse(""); // Clear previous response
+          setResponse("");
         };
 
         newSocket.onmessage = (event) => {
           try {
             const message = JSON.parse(event.data);
             if (message.token && message.token.trim() !== "") {
-              console.log("Token received:", message.token); // Debugging
+              console.log("Token received:", message.token);
               setResponse((prevResponse) => prevResponse + message.token);
-
-              // Update the response in the history correctly
               setHistory((prevHistory) => {
                 const updatedHistory = [...prevHistory];
-                const lastEntry = {
-                  ...updatedHistory[updatedHistory.length - 1],
-                }; // Create a new object
-                lastEntry.response += message.token; // Append token safely
-                updatedHistory[updatedHistory.length - 1] = lastEntry; // Update the last entry
+                updatedHistory[updatedHistory.length - 1].response +=
+                  message.token;
                 return updatedHistory;
               });
             }
@@ -95,12 +87,9 @@ export default function Home() {
         };
       } else {
         socket.send(JSON.stringify({ prompt }));
-        setHistory((prevHistory) => [
-          ...prevHistory,
-          { prompt, response: "" }, // Add new prompt to history with empty response
-        ]);
+        setHistory((prevHistory) => [...prevHistory, { prompt, response: "" }]);
         setPrompt("");
-        setResponse(""); // Clear previous response
+        setResponse("");
       }
     }
   };
@@ -108,7 +97,18 @@ export default function Home() {
   return (
     <ProtectedRoute>
       <div className="app-container">
-        <h1>IELTS</h1>
+        <div className="relative flex items-center justify-center p-4 text-white">
+          <h1 className="absolute top-4 -left-80 text-xl font-bold">IELTS</h1>
+
+          {/* ✅ Logout button */}
+          <button
+            className="absolute top-2 -right-80 bg-red-500 px-5 py-2 rounded hover:bg-red-600"
+            onClick={logout}
+          >
+            Logout
+          </button>
+        </div>
+
         <div className="content-container">
           {history.map((entry, index) => (
             <div key={index} className="history-entry">
@@ -126,6 +126,7 @@ export default function Home() {
             </div>
           ))}
         </div>
+
         <div className="input-container">
           <textarea
             id="promptInput"
@@ -134,20 +135,17 @@ export default function Home() {
             placeholder="Type your prompt here..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            style={{
-              minHeight: "100px",
-              maxHeight: "200px",
-              resize: "none",
-            }}
+            style={{ minHeight: "100px", maxHeight: "200px", resize: "none" }}
           />
           <button
             id="sendButton"
             onClick={sendPrompt}
-            disabled={!prompt.trim()} // Disable the button if the prompt is empty
+            disabled={!prompt.trim()}
           >
             Send
           </button>
         </div>
+
         <style jsx>{`
           .app-container {
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -170,7 +168,7 @@ export default function Home() {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Align history entries to the top */
+            justify-content: flex-start;
             overflow-y: auto;
             padding: 10px;
           }
@@ -183,13 +181,6 @@ export default function Home() {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-          }
-
-          h1 {
-            font-size: 22px;
-            color: #fff;
-            margin-bottom: 20px;
-            text-align: center;
           }
 
           .history-entry {
@@ -256,4 +247,3 @@ export default function Home() {
     </ProtectedRoute>
   );
 }
-// Compare this snippet from client/app/%28root%29/_app.jsx:

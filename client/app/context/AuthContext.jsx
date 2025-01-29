@@ -22,8 +22,18 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  // ✅ Logout function
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/"); // Redirect to login after logout
+    } catch (error) {
+      console.error("Logout failed:", error.message);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );

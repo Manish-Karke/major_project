@@ -4,7 +4,7 @@ import {
   GoogleAuthProvider,
   signOut,
 } from "firebase/auth";
-import app from "./Firebase";
+import { app } from "./Firebase";
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
@@ -23,7 +23,8 @@ export const signInWithGoogle = async () => {
 export const logout = async () => {
   try {
     await signOut(auth);
+    console.log("User logged out successfully");
   } catch (error) {
-    console.error("Logout Error:", error);
+    console.error("Logout failed:", error);
   }
 };
