@@ -59,19 +59,22 @@ export default function Home() {
           try {
             const message = JSON.parse(event.data);
             if (message.token && message.token.trim() !== "") {
-              console.log("Token received:", message.token);
+              console.log("Token received:", message.token); // Debugging
               setResponse((prevResponse) => prevResponse + message.token);
+        
+              // Update the response in the history correctly
               setHistory((prevHistory) => {
                 const updatedHistory = [...prevHistory];
-                updatedHistory[updatedHistory.length - 1].response +=
-                  message.token;
+                const lastEntry = { ...updatedHistory[updatedHistory.length - 1] }; // Create a new object
+                lastEntry.response += message.token; // Append token safely
+                updatedHistory[updatedHistory.length - 1] = lastEntry; // Update the last entry
                 return updatedHistory;
               });
             }
           } catch (err) {
             console.error("Error parsing WebSocket message:", err);
           }
-        };
+        };        
 
         newSocket.onerror = () => {
           clearTimeout(timeout);
@@ -97,18 +100,18 @@ export default function Home() {
   return (
     <ProtectedRoute>
       <div className="app-container">
-        <div className="relative flex items-center justify-center p-4 text-white">
-          <h1 className="absolute top-4 -left-80 text-xl font-bold">IELTS</h1>
+        <nav className="w-full bg-gray-900 text-white p-4 flex items-center justify-between shadow-md">
+          {/* ✅ Logo / Title */}
+          <h1 className="text-xl font-bold ml-4">IELTS</h1>
 
-          {/* ✅ Logout button */}
+          {/* ✅ Logout Button */}
           <button
-            className="absolute top-2 -right-80 bg-red-500 px-5 py-2 rounded hover:bg-red-600"
+            className="bg-red-500 px-2 py-1 rounded hover:bg-red-600 mr-4"
             onClick={logout}
           >
             Logout
           </button>
-        </div>
-
+        </nav>
         <div className="content-container">
           {history.map((entry, index) => (
             <div key={index} className="history-entry">
@@ -126,26 +129,25 @@ export default function Home() {
             </div>
           ))}
         </div>
-
         <div className="input-container">
-          <textarea
-            id="promptInput"
-            ref={textareaRef}
-            rows="1"
-            placeholder="Type your prompt here..."
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            style={{ minHeight: "100px", maxHeight: "200px", resize: "none" }}
-          />
-          <button
-            id="sendButton"
-            onClick={sendPrompt}
-            disabled={!prompt.trim()}
-          >
-            Send
-          </button>
+          <div className="textarea-wrapper">
+            <textarea
+              id="promptInput"
+              ref={textareaRef}
+              rows="3"
+              placeholder="Type your prompt here..."
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+            />
+            <button
+              id="sendButton"
+              onClick={sendPrompt}
+              disabled={!prompt.trim()}
+            >
+              📩
+            </button>
+          </div>
         </div>
-
         <style jsx>{`
           .app-container {
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -177,10 +179,23 @@ export default function Home() {
             width: 80%;
             max-width: 600px;
             margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+          }
+
+          .textarea-wrapper {
+            position: relative;
+            width: 100%;
+          }
+
+          textarea {
+            width: 100%;
+            min-height: 100px;
+            max-height: 200px;
+            resize: none;
+            padding: 10px;
+            padding-bottom: 45px; /* Creates space for button inside */
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
           }
 
           .history-entry {
@@ -223,19 +238,19 @@ export default function Home() {
           }
 
           #sendButton {
-            width: 100%;
-            padding: 12px;
-            margin-top: 12px;
-            background-color: #4caf50;
+            position: absolute;
+            bottom: 9px;
+            right: 3px;
+            height: 30px;
+            width: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-          }
-
-          #sendButton:hover {
-            background-color: #45a049;
           }
 
           #sendButton:disabled {
