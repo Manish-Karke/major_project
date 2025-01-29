@@ -22,7 +22,9 @@ export default function Home() {
     if (prompt.trim()) {
       // Attempt to connect WebSocket if not already connected
       if (!socket || socket.readyState !== WebSocket.OPEN) {
-        const newSocket = new WebSocket("wss://ray-champion-crow.ngrok-free.app/stream/");
+        const newSocket = new WebSocket(
+          "wss://ray-champion-crow.ngrok-free.app/stream/"
+        );
         setSocket(newSocket);
 
         const timeout = setTimeout(() => {
@@ -56,7 +58,9 @@ export default function Home() {
 
         newSocket.onerror = () => {
           clearTimeout(timeout);
-          alert("There was an error connecting to the server. Please try again.");
+          alert(
+            "There was an error connecting to the server. Please try again."
+          );
           setSocket(null);
         };
 
@@ -76,11 +80,11 @@ export default function Home() {
 
   return (
     <div className="app-container">
-      <h1>WebSocket Token Display</h1>
+      <h1>Automatic Essay Evaluator</h1>
       <div className="content-container">
         {tokensVisible && (
           <>
-            <div id="userPrompt" className="user-prompt">
+            <div id="userPrompt" className="user-prompt ">
               {userPrompt}
             </div>
             <div id="tokensContainer" className="tokens-container">
@@ -136,7 +140,9 @@ export default function Home() {
 
         .content-container {
           width: 100%;
-          height: calc(100vh - 160px); /* Remaining height after title and input */
+          height: calc(
+            100vh - 160px
+          ); /* Remaining height after title and input */
           overflow-y: auto;
           padding: 10px;
           display: flex;
@@ -190,7 +196,7 @@ export default function Home() {
           width: 100%;
           padding: 12px;
           margin-top: 12px;
-          background-color: #4CAF50;
+          background-color: #4caf50;
           color: white;
           border: none;
           border-radius: 8px;
@@ -215,7 +221,8 @@ export default function Home() {
           justify-content: flex-start;
         }
 
-        #promptInput, #sendButton {
+        #promptInput,
+        #sendButton {
           margin-top: 10px;
         }
       `}</style>
