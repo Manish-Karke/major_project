@@ -3,6 +3,9 @@ import React, { useState, useEffect, useRef } from "react";
 import ProtectedRoute from "./ProtectedRoute";
 import { logout } from "../Firebase/auth";
 
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "../sidebar/Sidebar";
+
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
@@ -61,11 +64,13 @@ export default function Home() {
             if (message.token && message.token.trim() !== "") {
               console.log("Token received:", message.token); // Debugging
               setResponse((prevResponse) => prevResponse + message.token);
-        
+
               // Update the response in the history correctly
               setHistory((prevHistory) => {
                 const updatedHistory = [...prevHistory];
-                const lastEntry = { ...updatedHistory[updatedHistory.length - 1] }; // Create a new object
+                const lastEntry = {
+                  ...updatedHistory[updatedHistory.length - 1],
+                }; // Create a new object
                 lastEntry.response += message.token; // Append token safely
                 updatedHistory[updatedHistory.length - 1] = lastEntry; // Update the last entry
                 return updatedHistory;
@@ -74,7 +79,7 @@ export default function Home() {
           } catch (err) {
             console.error("Error parsing WebSocket message:", err);
           }
-        };        
+        };
 
         newSocket.onerror = () => {
           clearTimeout(timeout);
@@ -99,9 +104,14 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
+    <SidebarProvider>
+    <AppSidebar />
+    <SidebarTrigger />
       <div className="app-container">
+    
         <nav className="w-full bg-gray-900 text-white p-4 flex items-center justify-between shadow-md">
           {/* ✅ Logo / Title */}
+      
           <h1 className="text-xl font-bold ml-4">IELTS</h1>
 
           {/* ✅ Logout Button */}
@@ -259,6 +269,8 @@ export default function Home() {
           }
         `}</style>
       </div>
+      </SidebarProvider>
     </ProtectedRoute>
+
   );
 }
