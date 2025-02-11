@@ -3,9 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import ProtectedRoute from "./ProtectedRoute";
 import { logout } from "../Firebase/auth";
 
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "../sidebar/Sidebar";
-
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
@@ -68,9 +65,7 @@ export default function Home() {
               // Update the response in the history correctly
               setHistory((prevHistory) => {
                 const updatedHistory = [...prevHistory];
-                const lastEntry = {
-                  ...updatedHistory[updatedHistory.length - 1],
-                }; // Create a new object
+                const lastEntry = { ...updatedHistory[updatedHistory.length - 1] }; // Create a new object
                 lastEntry.response += message.token; // Append token safely
                 updatedHistory[updatedHistory.length - 1] = lastEntry; // Update the last entry
                 return updatedHistory;
@@ -104,14 +99,9 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-    <SidebarProvider>
-    <AppSidebar />
-    <SidebarTrigger />
       <div className="app-container">
-    
         <nav className="w-full bg-gray-900 text-white p-4 flex items-center justify-between shadow-md">
           {/* ✅ Logo / Title */}
-      
           <h1 className="text-xl font-bold ml-4">IELTS</h1>
 
           {/* ✅ Logout Button */}
@@ -127,12 +117,31 @@ export default function Home() {
             <div key={index} className="history-entry">
               <div className="user-prompt">{entry.prompt}</div>
               <div className="tokens-container">
-                {entry.response.split("\n").map((line, lineIndex) => (
+                {entry.response.split("\n").map((line, lineIndex, arr) => (
                   <React.Fragment key={lineIndex}>
-                    {line}
-                    {lineIndex < entry.response.split("\n").length - 1 && (
-                      <br />
+                    {line.startsWith("#") || line.startsWith("*") ? (
+                      <>
+                        {lineIndex > 0 && <br />}
+                        <strong>{line.substring(1).trim()}</strong>
+                      </>
+                    ) : line.startsWith("-") ? (
+                      // Check if the line matches specific keywords (e.g., Strengths, Vocabulary, Grammar)
+                      line.includes("Strengths:") || line.includes("Vocabulary:") || line.includes("Grammar:")  || line.includes("Areas for improvement:") ? (
+                        <>
+                          {lineIndex > 0 && <br />}
+                          <strong>{line.trim()}</strong>
+                        </>
+                      ) : (
+                        <>
+                          <ul>
+                            <li>{line.substring(1).trim()}</li>
+                          </ul>
+                        </>
+                      )
+                    ) : (
+                      line
                     )}
+                    {lineIndex < arr.length - 1 && !line.startsWith("-") && <br />}
                   </React.Fragment>
                 ))}
               </div>
@@ -186,9 +195,9 @@ export default function Home() {
           }
 
           .input-container {
-            width: 80%;
-            max-width: 600px;
-            margin-top: 20px;
+            width: 90%;
+            max-width: 700px;
+            margin-top: 0px;
           }
 
           .textarea-wrapper {
@@ -197,9 +206,9 @@ export default function Home() {
           }
 
           textarea {
-            width: 100%;
-            min-height: 100px;
-            max-height: 200px;
+            width: 80%;
+            min-height: 80px;
+            max-height: 150px;
             resize: none;
             padding: 10px;
             padding-bottom: 45px; /* Creates space for button inside */
@@ -209,14 +218,17 @@ export default function Home() {
           }
 
           .history-entry {
-            width: 80%;
-            max-width: 600px;
-            margin-bottom: 20px;
+            width: 90%;
+            max-width: 700px;
+            margin-bottom: 40px;
           }
 
           .user-prompt {
             padding: 10px;
             border-radius: 8px;
+            width: 90%;
+            margin-left: auto;  
+            dispaly: block;
             background-color: #444;
             border: 1px solid #555;
             color: rgb(140, 179, 188);
@@ -226,12 +238,24 @@ export default function Home() {
           }
 
           .tokens-container {
-            margin-top: 10px;
+            margin-top: 40px;
             white-space: pre-wrap;
             word-wrap: break-word;
             text-align: start;
             font-size: 15px;
             color: #ddd;
+          }
+
+          .tokens-container ul {
+            list-style: disc outside none;
+            text-align: justify;
+            margin-top: 7px;
+            margin-bottom: 2px;
+            padding-left: 50px; /* Adjust this value as needed */
+            // text-indent: -24.5px; /* Adjust this to fine-tune bullet position */
+            font-size: 1rem;
+            color: #ddd;
+            line-height: 1.5;
           }
 
           #promptInput {
@@ -241,7 +265,7 @@ export default function Home() {
             margin-top: 20px;
             border: 1px solid #555;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             background-color: #222;
             color: #fff;
             overflow-y: auto;
@@ -269,8 +293,6 @@ export default function Home() {
           }
         `}</style>
       </div>
-      </SidebarProvider>
     </ProtectedRoute>
-
   );
 }
