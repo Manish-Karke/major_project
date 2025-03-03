@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // Router for navigation
-import { auth } from "./Firebase/Firebase"; // Correct Firebase import
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../Firebase/Firebase"; // Correct Firebase import
+import { signInWithEmailAndPassword } from "../Firebase/auth";
 
 export default function Login() {
   const [step, setStep] = useState(1); // Step 1: Email, Step 2: Password
@@ -46,8 +46,7 @@ export default function Login() {
       await signInWithEmailAndPassword(auth, email, password);
       setIsLoggedIn(true);
       setTimeout(() => {
-        setIsLoggedIn(false);
-        router.push("../../components"); // Redirect after login
+        router.push("/components")
       }, 2000);
     } catch (error) {
       setError(error.message);
